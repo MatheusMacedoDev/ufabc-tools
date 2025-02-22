@@ -48,28 +48,23 @@ def get_classes_dataframe(pdf_uri):
     return classes_dataframe
 
 
-def apply_classes_dataframe_filters(dataframe, turn, course):
-    dataframe = dataframe[dataframe.Turno == turn]
-    dataframe = dataframe[dataframe.Curso == course]
-
-    return dataframe
-
-
 if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. Deseja prosseguir? '):
+
+    classes_pdf_uri = 'turmas_ofertadas.pdf'
+    classes_dataframe = get_classes_dataframe(classes_pdf_uri)
+
+    # Filter by class turn
     turns = [
         'Matutino',
         'Noturno'
     ]
 
     selected_turn = select(turns, cursor='🢧')
+    classes_dataframe = classes_dataframe[classes_dataframe.Turno == selected_turn]
 
-    classes_pdf_uri = 'turmas_ofertadas.pdf'
-
-    classes_dataframe = get_classes_dataframe(classes_pdf_uri)
-
+    # Filter by class course
     courses = classes_dataframe['Curso'].unique().tolist()
     selected_course = select(courses, cursor='🢧')
+    classes_dataframe = classes_dataframe[classes_dataframe.Curso == selected_course]
 
-    classes_dataframe = apply_classes_dataframe_filters(classes_dataframe, selected_turn, selected_course)
-
-    print(classes_dataframe.iloc[0])
+    print(classes_dataframe)
