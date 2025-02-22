@@ -1,7 +1,20 @@
 import tabula
 import pandas
+import re
 
 from beaupy import confirm, select
+
+def get_subject_from_class_title(class_title):
+    return class_title.split('-')[0][:-3]
+
+
+def get_class_number_from_class_title(class_title):
+    return class_title.split('-')[0].split(' ').pop()
+
+
+def get_subject_code_from_class_code(class_code):
+    return class_code[3:-2]
+
 
 def format_classes_dataframe(dataframe):
     dataframe.columns = ['Curso', 'Código de turma', 'Turma', 'Teoria', 'Prática', 'Campus', 'Turno', 'T-P-I', 'Vagas totais', 'Vagas veteranos', 'Docente teoria', 'Docente teoria 2', 'Docente prática', 'Docente prática 2']
@@ -12,6 +25,16 @@ def format_classes_dataframe(dataframe):
     dataframe['Curso'] = dataframe['Curso'].str.replace('\r', ' ')
     dataframe['Docente teoria'] = dataframe['Docente teoria'].str.replace('\r', ' ')
     dataframe['Docente prática'] = dataframe['Docente prática'].str.replace('\r', ' ')
+    dataframe['Turma'] = dataframe['Turma'].str.replace('\r', ' ')
+    dataframe['Teoria'] = dataframe['Teoria'].str.replace('\r', ' ')
+    dataframe['Prática'] = dataframe['Prática'].str.replace('\r', ' ')
+
+    dataframe['Matéria'] = dataframe['Turma'].apply(get_subject_from_class_title)
+    dataframe['Turma'] = dataframe['Turma'].apply(get_class_number_from_class_title)
+
+    dataframe['Código da matéria'] = dataframe['Código de turma'].apply(get_subject_code_from_class_code)
+
+    dataframe = dataframe.drop('Código de turma', axis=1)
 
     return dataframe
 
@@ -49,4 +72,4 @@ if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. D
 
     classes_dataframe = apply_classes_dataframe_filters(classes_dataframe, selected_turn, selected_course)
 
-    print(classes_dataframe)
+    print(classes_dataframe.iloc[0])
