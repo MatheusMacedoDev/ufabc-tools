@@ -65,6 +65,15 @@ if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. D
     selected_turn = select(turns, cursor='🢧')
     classes_dataframe = classes_dataframe[classes_dataframe.Turno == selected_turn]
 
+    # Filter by class campus
+    campus = [
+        'SA',
+        'SB'
+    ]
+
+    selected_campus = select(campus, cursor='🢧')
+    classes_dataframe = classes_dataframe[classes_dataframe.Campus == selected_campus]
+
     # Filter by class course
     courses = classes_dataframe['Curso'].unique().tolist()
     selected_course = select(courses, cursor='🢧')
