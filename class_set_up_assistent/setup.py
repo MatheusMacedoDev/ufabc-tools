@@ -1,11 +1,12 @@
 import tabula
 import pandas
-import re
 
 from beaupy import confirm, select
 
 def get_subject_from_class_title(class_title):
-    return class_title.split('-')[0][:-3]
+    title_array = class_title.split('-')
+    title_array.pop()
+    return '-'.join(title_array)[:-3]
 
 
 def get_class_number_from_class_title(class_title):
