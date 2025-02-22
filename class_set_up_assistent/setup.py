@@ -70,4 +70,9 @@ if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. D
     selected_course = select(courses, cursor='🢧')
     classes_dataframe = classes_dataframe[classes_dataframe.Curso == selected_course]
 
+    # Filter by class subject
+    subjects = classes_dataframe['Matéria'].unique().tolist()
+    selected_subject = select(subjects, cursor='🢧')
+    classes_dataframe = classes_dataframe[classes_dataframe['Matéria'] == selected_subject]
+
     print(classes_dataframe)
