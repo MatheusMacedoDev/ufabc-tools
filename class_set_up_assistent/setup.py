@@ -44,7 +44,7 @@ def format_classes_dataframe(dataframe):
 
 def get_classes_dataframe(pdf_uri):
 
-    classes_dataframe_pdf = tabula.read_pdf(pdf_uri, pages='1-5', encoding='latin-1')
+    classes_dataframe_pdf = tabula.read_pdf(pdf_uri, pages='all', encoding='latin-1', lattice=True)
     classes_dataframe = pandas.concat(classes_dataframe_pdf)
     classes_dataframe = format_classes_dataframe(classes_dataframe)
 
