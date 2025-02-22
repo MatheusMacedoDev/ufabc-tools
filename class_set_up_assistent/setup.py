@@ -9,7 +9,9 @@ def get_subject_from_class_title(class_title):
 
 
 def get_class_number_from_class_title(class_title):
-    return class_title.split('-')[0].split(' ').pop()
+    title_array = class_title.split('-')
+    title_array.pop()
+    return ' '.join(title_array).split(' ').pop()
 
 
 def get_subject_code_from_class_code(class_code):
