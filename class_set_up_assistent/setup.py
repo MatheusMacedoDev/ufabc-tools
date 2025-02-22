@@ -51,37 +51,66 @@ def get_classes_dataframe(pdf_uri):
     return classes_dataframe
 
 
-if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. Deseja prosseguir? '):
-
-    classes_pdf_uri = 'turmas_ofertadas.pdf'
-    classes_dataframe = get_classes_dataframe(classes_pdf_uri)
-
-    # Filter by class turn
+def filter_classes_by_turn(dataframe):
     turns = [
         'Matutino',
         'Noturno'
     ]
 
     selected_turn = select(turns, cursor='🢧')
-    classes_dataframe = classes_dataframe[classes_dataframe.Turno == selected_turn]
+    dataframe = dataframe[dataframe.Turno == selected_turn]
 
-    # Filter by class campus
+    return dataframe
+
+
+def filter_classes_by_campus(dataframe):
     campus = [
         'SA',
-        'SB'
+        'SB',
+        '[yellow]Voltar[/yellow]'
     ]
 
     selected_campus = select(campus, cursor='🢧')
-    classes_dataframe = classes_dataframe[classes_dataframe.Campus == selected_campus]
+
+    if selected_campus == '[yellow]Voltar[/yellow]':
+        return dataframe
+
+    dataframe = dataframe[dataframe.Campus == selected_campus]
+
+    return dataframe
+
+
+def filter_classes_by_course(dataframe):
+    courses = dataframe['Curso'].unique().tolist()
+    selected_course = select(courses, cursor='🢧')
+    dataframe = dataframe[dataframe.Curso == selected_course]
+
+    return dataframe
+
+
+def filter_classes_by_subject(dataframe):
+    subjects = filtered_dataframe['Matéria'].unique().tolist()
+    selected_subject = select(subjects, cursor='🢧')
+    dataframe = dataframe[dataframe['Matéria'] == selected_subject]
+
+    return dataframe
+
+
+if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. Deseja prosseguir? '):
+
+    classes_pdf_uri = 'turmas_ofertadas.pdf'
+    classes_dataframe = get_classes_dataframe(classes_pdf_uri)
+
+    # Filter by class turn
+    filtered_dataframe = filter_classes_by_turn(classes_dataframe)
+
+    # Filter by class campus
+    filtered_dataframe = filter_classes_by_campus(filtered_dataframe)
 
     # Filter by class course
-    courses = classes_dataframe['Curso'].unique().tolist()
-    selected_course = select(courses, cursor='🢧')
-    classes_dataframe = classes_dataframe[classes_dataframe.Curso == selected_course]
+    filtered_dataframe = filter_classes_by_course(filtered_dataframe)
 
     # Filter by class subject
-    subjects = classes_dataframe['Matéria'].unique().tolist()
-    selected_subject = select(subjects, cursor='🢧')
-    classes_dataframe = classes_dataframe[classes_dataframe['Matéria'] == selected_subject]
+    filtered_dataframe = filter_classes_by_subject(filtered_dataframe)
 
-    print(classes_dataframe)
+    print(filtered_dataframe)
