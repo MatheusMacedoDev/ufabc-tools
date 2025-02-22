@@ -101,16 +101,23 @@ if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. D
     classes_pdf_uri = 'turmas_ofertadas.pdf'
     classes_dataframe = get_classes_dataframe(classes_pdf_uri)
 
-    # Filter by class turn
-    filtered_dataframe = filter_classes_by_turn(classes_dataframe)
+    isRunning = True;
 
-    # Filter by class campus
-    filtered_dataframe = filter_classes_by_campus(filtered_dataframe)
+    while(isRunning):
+        # Filter by class turn
+        filtered_dataframe = filter_classes_by_turn(classes_dataframe)
 
-    # Filter by class course
-    filtered_dataframe = filter_classes_by_course(filtered_dataframe)
+        # Filter by class campus
+        filtered_dataframe = filter_classes_by_campus(filtered_dataframe)
 
-    # Filter by class subject
-    filtered_dataframe = filter_classes_by_subject(filtered_dataframe)
+        # Filter by class course
+        filtered_dataframe = filter_classes_by_course(filtered_dataframe)
 
-    print(filtered_dataframe)
+        # Filter by class subject
+        filtered_dataframe = filter_classes_by_subject(filtered_dataframe)
+
+        print(filtered_dataframe)
+
+        print('\n')
+
+        isRunning = confirm('[cyan]Deseja fazer uma nova busca?[/cyan]')
