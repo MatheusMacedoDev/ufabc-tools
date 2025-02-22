@@ -17,20 +17,22 @@ def format_classes_dataframe(dataframe):
 
 
 def get_classes_dataframe(pdf_uri):
-    classes_dataframe_pdf = tabula.read_pdf(pdf_uri, pages='1', encoding='latin-1')
+
+    classes_dataframe_pdf = tabula.read_pdf(pdf_uri, pages='1-5', encoding='latin-1')
     classes_dataframe = pandas.concat(classes_dataframe_pdf)
     classes_dataframe = format_classes_dataframe(classes_dataframe)
 
     return classes_dataframe
 
 
-def apply_classes_dataframe_filters(dataframe, turn):
+def apply_classes_dataframe_filters(dataframe, turn, course):
     dataframe = dataframe[dataframe.Turno == turn]
+    dataframe = dataframe[dataframe.Curso == course]
 
     return dataframe
 
 
-if confirm('Esse script promete te ajudar a montar sua grade na UFABC. Deseja prosseguir? '):
+if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. Deseja prosseguir? '):
     turns = [
         'Matutino',
         'Noturno'
@@ -41,7 +43,10 @@ if confirm('Esse script promete te ajudar a montar sua grade na UFABC. Deseja pr
     classes_pdf_uri = 'turmas_ofertadas.pdf'
 
     classes_dataframe = get_classes_dataframe(classes_pdf_uri)
-    classes_dataframe = apply_classes_dataframe_filters(classes_dataframe, selected_turn)
+
+    courses = classes_dataframe['Curso'].unique().tolist()
+    selected_course = select(courses, cursor='🢧')
+
+    classes_dataframe = apply_classes_dataframe_filters(classes_dataframe, selected_turn, selected_course)
 
     print(classes_dataframe)
-    print(classes_dataframe.dtypes)
