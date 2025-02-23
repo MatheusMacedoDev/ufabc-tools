@@ -25,6 +25,16 @@ def get_class_number_from_class_title(class_title):
 def get_subject_code_from_class_code(class_code):
     return class_code[3:-2]
 
+
+def format_text(text):
+    if text == 'nan' or text == '0':
+        return '-'
+
+    text = text.replace('\r', ' ')
+
+    return text
+
+
 def print_ufabc_logo():
     print('''
 █░█ █▀▀ ▄▀█ █▄▄ █▀▀
@@ -38,12 +48,15 @@ def format_classes_dataframe(dataframe):
     dataframe = dataframe.drop('Docente teoria 2', axis=1)
     dataframe = dataframe.drop('Docente prática 2', axis=1)
 
-    dataframe['Curso'] = dataframe['Curso'].str.replace('\r', ' ')
-    dataframe['Docente teoria'] = dataframe['Docente teoria'].str.replace('\r', ' ')
-    dataframe['Docente prática'] = dataframe['Docente prática'].str.replace('\r', ' ')
-    dataframe['Turma'] = dataframe['Turma'].str.replace('\r', ' ')
-    dataframe['Teoria'] = dataframe['Teoria'].str.replace('\r', ' ')
-    dataframe['Prática'] = dataframe['Prática'].str.replace('\r', ' ')
+    dataframe = dataframe.astype({ 'Prática': str, 'Docente teoria': str, 'Docente prática': str, 'Teoria': str })
+
+    dataframe['Curso'] = dataframe['Curso'].apply(format_text)
+    dataframe['Docente teoria'] = dataframe['Docente teoria'].apply(format_text)
+    dataframe['Docente prática'] = dataframe['Docente prática'].apply(format_text)
+    dataframe['Turma'] = dataframe['Turma'].apply(format_text)
+    dataframe['Teoria'] = dataframe['Teoria'].apply(format_text)
+
+    dataframe['Prática'] = dataframe['Prática'].apply(format_text);
 
     dataframe['Matéria'] = dataframe['Turma'].apply(get_subject_from_class_title)
     dataframe['Turma'] = dataframe['Turma'].apply(get_class_number_from_class_title)
