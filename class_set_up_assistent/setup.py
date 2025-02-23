@@ -1,7 +1,14 @@
 import tabula
+from tabulate import tabulate
 import pandas
 
 from beaupy import confirm, select
+from beaupy.spinners import *
+
+from rich import print
+from rich.console import Console
+
+console = Console()
 
 def get_subject_from_class_title(class_title):
     title_array = class_title.split('-')
@@ -17,6 +24,12 @@ def get_class_number_from_class_title(class_title):
 
 def get_subject_code_from_class_code(class_code):
     return class_code[3:-2]
+
+def print_ufabc_logo():
+    print('''
+█░█ █▀▀ ▄▀█ █▄▄ █▀▀
+█▄█ █▀░ █▀█ █▄█ █▄▄
+    ''')
 
 
 def format_classes_dataframe(dataframe):
@@ -39,6 +52,8 @@ def format_classes_dataframe(dataframe):
 
     dataframe = dataframe.drop('Código de turma', axis=1)
 
+    dataframe = dataframe.iloc[:, [0, 11, 1, 9, 10, 2, 3, 4, 5, 6, 7, 8, 12]]
+
     return dataframe
 
 
@@ -58,10 +73,14 @@ def filter_classes_by_turn(dataframe):
         '[yellow]Não filtrar[/yellow]'
     ]
 
+    print_ufabc_logo()
+    print('[cyan]Selecione o turno:[/cyan]\n')
     selected_turn = select(turns, cursor='🢧')
+    console.clear()
 
     if selected_turn == '[yellow]Não filtrar[/yellow]':
         return dataframe
+
 
     dataframe = dataframe[dataframe.Turno == selected_turn]
 
@@ -75,7 +94,10 @@ def filter_classes_by_campus(dataframe):
         '[yellow]Não filtrar[/yellow]'
     ]
 
+    print_ufabc_logo()
+    print('[cyan]Selecione o campus:[/cyan]\n')
     selected_campus = select(campus, cursor='🢧')
+    console.clear()
 
     if selected_campus == '[yellow]Não filtrar[/yellow]':
         return dataframe
@@ -89,7 +111,10 @@ def filter_classes_by_course(dataframe):
     courses = list(dataframe['Curso'].unique().tolist())
     courses.append('[yellow]Não filtrar[/yellow]')
 
+    print_ufabc_logo()
+    print('[cyan]Selecione o curso:[/cyan]\n')
     selected_course = select(courses, cursor='🢧')
+    console.clear()
 
     if selected_course == '[yellow]Não filtrar[/yellow]':
         return dataframe
@@ -103,7 +128,10 @@ def filter_classes_by_subject(dataframe):
     subjects = list(filtered_dataframe['Matéria'].unique().tolist())
     subjects.append('[yellow]Não filtrar[/yellow]')
 
+    print_ufabc_logo()
+    print('[cyan]Selecione a matéria:[/cyan]\n')
     selected_subject = select(subjects, cursor='🢧')
+    console.clear()
 
     if selected_subject == '[yellow]Não filtrar[/yellow]':
         return dataframe
@@ -113,14 +141,43 @@ def filter_classes_by_subject(dataframe):
     return dataframe
 
 
-if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. Deseja prosseguir? '):
+spinner = Spinner(ARC, 'Carregando...')
+
+console.clear()
+
+print('''
+⠀⠀⠀⠀⠀⠀⣤⡀⠀⠀⣠⢶⠀⠀⠀
+⠀⠀⠀⣀⡤⣾⠀⠓⠒⠚⠛⣇⠀⠀⠀
+⠀⠀⣼⠱⡥⣬⣧⠀⢀⡀⣀⠈⢷⠀⠀
+⠀⠀⠈⠳⢧⠼⠌⠀⠈⠁⠉⢐⠛⠀⠀
+⢠⡴⠦⠤⠬⡗⡆⠀⠀⠀⠀⠘⢦⠀⠀
+⠘⣄⠈⠙⣲⠛⠉⠀⠀⠀⠀⠀⠀⠓⣦
+⠀⠁⠙⠂⡉⡇⠀⠀⠀⡀⠀⠀⢸⠉⠉
+⠀⠀⠀⠀⠀⠸⡄⠀⡌⠀⠱⣄⢸⠀⠀
+
+█░█ █▀▀ ▄▀█ █▄▄ █▀▀
+█▄█ █▀░ █▀█ █▄█ █▄▄
+
+(Por: Matheus Macedo)
+''')
+
+if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Deseja prosseguir?[/cyan]', default_is_yes=True):
+
+    console.clear()
+    print_ufabc_logo()
+
+    spinner.start()
 
     classes_pdf_uri = 'turmas_ofertadas.pdf'
     classes_dataframe = get_classes_dataframe(classes_pdf_uri)
 
+    spinner.stop()
+
     isRunning = True;
 
     while(isRunning):
+        console.clear()
+
         # Filter by class turn
         filtered_dataframe = filter_classes_by_turn(classes_dataframe)
 
@@ -133,8 +190,9 @@ if True or confirm('Esse script promete te ajudar a montar sua grade na UFABC. D
         # Filter by class subject
         filtered_dataframe = filter_classes_by_subject(filtered_dataframe)
 
-        print(filtered_dataframe)
+        console.clear()
+        print(tabulate(filtered_dataframe, headers='keys', tablefmt='psql', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
 
         print('\n')
 
-        isRunning = confirm('[cyan]Deseja fazer uma nova busca?[/cyan]')
+        isRunning = confirm('[cyan]Deseja fazer uma nova busca?[/cyan]', default_is_yes=True)
