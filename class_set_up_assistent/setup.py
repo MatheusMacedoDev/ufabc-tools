@@ -204,7 +204,7 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
         filtered_dataframe = filter_classes_by_subject(filtered_dataframe)
 
         console.clear()
-        print(tabulate(filtered_dataframe, headers='keys', tablefmt='psql', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
+        print(tabulate(filtered_dataframe, headers='keys', tablefmt='mixed_grid', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
 
         print('\n')
 
