@@ -54,10 +54,15 @@ def get_classes_dataframe(pdf_uri):
 def filter_classes_by_turn(dataframe):
     turns = [
         'Matutino',
-        'Noturno'
+        'Noturno',
+        '[yellow]Não filtrar[/yellow]'
     ]
 
     selected_turn = select(turns, cursor='🢧')
+
+    if selected_turn == '[yellow]Não filtrar[/yellow]':
+        return dataframe
+
     dataframe = dataframe[dataframe.Turno == selected_turn]
 
     return dataframe
@@ -67,12 +72,12 @@ def filter_classes_by_campus(dataframe):
     campus = [
         'SA',
         'SB',
-        '[yellow]Voltar[/yellow]'
+        '[yellow]Não filtrar[/yellow]'
     ]
 
     selected_campus = select(campus, cursor='🢧')
 
-    if selected_campus == '[yellow]Voltar[/yellow]':
+    if selected_campus == '[yellow]Não filtrar[/yellow]':
         return dataframe
 
     dataframe = dataframe[dataframe.Campus == selected_campus]
@@ -81,16 +86,28 @@ def filter_classes_by_campus(dataframe):
 
 
 def filter_classes_by_course(dataframe):
-    courses = dataframe['Curso'].unique().tolist()
+    courses = list(dataframe['Curso'].unique().tolist())
+    courses.append('[yellow]Não filtrar[/yellow]')
+
     selected_course = select(courses, cursor='🢧')
+
+    if selected_course == '[yellow]Não filtrar[/yellow]':
+        return dataframe
+
     dataframe = dataframe[dataframe.Curso == selected_course]
 
     return dataframe
 
 
 def filter_classes_by_subject(dataframe):
-    subjects = filtered_dataframe['Matéria'].unique().tolist()
+    subjects = list(filtered_dataframe['Matéria'].unique().tolist())
+    subjects.append('[yellow]Não filtrar[/yellow]')
+
     selected_subject = select(subjects, cursor='🢧')
+
+    if selected_subject == '[yellow]Não filtrar[/yellow]':
+        return dataframe
+
     dataframe = dataframe[dataframe['Matéria'] == selected_subject]
 
     return dataframe
