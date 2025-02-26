@@ -1,26 +1,19 @@
-#External imports
+# External imports
 
+import pandas
 import tabula
 from tabulate import tabulate
-import pandas
 
-from beaupy import confirm, select
+from beaupy import confirm
 from beaupy.spinners import *
 
 from rich import print
 from rich.console import Console
 
-#Internal imports
+# Internal imports
 
 import text
-
-console = Console()
-
-def print_ufabc_logo():
-    print('''
-█░█ █▀▀ ▄▀█ █▄▄ █▀▀
-█▄█ █▀░ █▀█ █▄█ █▄▄
-    ''')
+import cli
 
 
 def format_classes_dataframe(dataframe):
@@ -60,105 +53,18 @@ def get_classes_dataframe(pdf_uri):
     return classes_dataframe
 
 
-def filter_classes_by_turn(dataframe):
-    turns = [
-        'Matutino',
-        'Noturno',
-        '[yellow]Não filtrar[/yellow]'
-    ]
-
-    print_ufabc_logo()
-    print('[cyan]Selecione o turno:[/cyan]\n')
-    selected_turn = select(turns, cursor='🢧')
-    console.clear()
-
-    if selected_turn == '[yellow]Não filtrar[/yellow]':
-        return dataframe
-
-
-    dataframe = dataframe[dataframe.Turno == selected_turn]
-
-    return dataframe
-
-
-def filter_classes_by_campus(dataframe):
-    campus = [
-        'SA',
-        'SB',
-        '[yellow]Não filtrar[/yellow]'
-    ]
-
-    print_ufabc_logo()
-    print('[cyan]Selecione o campus:[/cyan]\n')
-    selected_campus = select(campus, cursor='🢧')
-    console.clear()
-
-    if selected_campus == '[yellow]Não filtrar[/yellow]':
-        return dataframe
-
-    dataframe = dataframe[dataframe.Campus == selected_campus]
-
-    return dataframe
-
-
-def filter_classes_by_course(dataframe):
-    courses = list(dataframe['Curso'].unique().tolist())
-    courses.append('[yellow]Não filtrar[/yellow]')
-
-    print_ufabc_logo()
-    print('[cyan]Selecione o curso:[/cyan]\n')
-    selected_course = select(courses, cursor='🢧')
-    console.clear()
-
-    if selected_course == '[yellow]Não filtrar[/yellow]':
-        return dataframe
-
-    dataframe = dataframe[dataframe.Curso == selected_course]
-
-    return dataframe
-
-
-def filter_classes_by_subject(dataframe):
-    subjects = list(filtered_dataframe['Matéria'].unique().tolist())
-    subjects.append('[yellow]Não filtrar[/yellow]')
-
-    print_ufabc_logo()
-    print('[cyan]Selecione a matéria:[/cyan]\n')
-    selected_subject = select(subjects, cursor='🢧')
-    console.clear()
-
-    if selected_subject == '[yellow]Não filtrar[/yellow]':
-        return dataframe
-
-    dataframe = dataframe[dataframe['Matéria'] == selected_subject]
-
-    return dataframe
-
+console = Console()
 
 spinner = Spinner(ARC, 'Carregando...')
 
 console.clear()
 
-print('''
-⠀⠀⠀⠀⠀⠀⣤⡀⠀⠀⣠⢶⠀⠀⠀
-⠀⠀⠀⣀⡤⣾⠀⠓⠒⠚⠛⣇⠀⠀⠀
-⠀⠀⣼⠱⡥⣬⣧⠀⢀⡀⣀⠈⢷⠀⠀
-⠀⠀⠈⠳⢧⠼⠌⠀⠈⠁⠉⢐⠛⠀⠀
-⢠⡴⠦⠤⠬⡗⡆⠀⠀⠀⠀⠘⢦⠀⠀
-⠘⣄⠈⠙⣲⠛⠉⠀⠀⠀⠀⠀⠀⠓⣦
-⠀⠁⠙⠂⡉⡇⠀⠀⠀⡀⠀⠀⢸⠉⠉
-⠀⠀⠀⠀⠀⠸⡄⠀⡌⠀⠱⣄⢸⠀⠀
-
-█░█ █▀▀ ▄▀█ █▄▄ █▀▀
-█▄█ █▀░ █▀█ █▄█ █▄▄
-
-(Por: Matheus Macedo)
-''')
+cli.print_start_decoration()
 
 if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Deseja prosseguir?[/cyan]', default_is_yes=True):
 
     console.clear()
-    print_ufabc_logo()
+    cli.print_ufabc_logo()
 
     spinner.start()
 
@@ -173,16 +79,16 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
         console.clear()
 
         # Filter by class turn
-        filtered_dataframe = filter_classes_by_turn(classes_dataframe)
+        filtered_dataframe = cli.filter_classes_by_turn(classes_dataframe)
 
         # Filter by class campus
-        filtered_dataframe = filter_classes_by_campus(filtered_dataframe)
+        filtered_dataframe = cli.filter_classes_by_campus(filtered_dataframe)
 
         # Filter by class course
-        filtered_dataframe = filter_classes_by_course(filtered_dataframe)
+        filtered_dataframe = cli.filter_classes_by_course(filtered_dataframe)
 
         # Filter by class subject
-        filtered_dataframe = filter_classes_by_subject(filtered_dataframe)
+        filtered_dataframe = cli.filter_classes_by_subject(filtered_dataframe)
 
         console.clear()
         print(tabulate(filtered_dataframe, headers='keys', tablefmt='mixed_grid', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
