@@ -1,3 +1,5 @@
+#External imports
+
 import tabula
 from tabulate import tabulate
 import pandas
@@ -8,32 +10,11 @@ from beaupy.spinners import *
 from rich import print
 from rich.console import Console
 
+#Internal imports
+
+import text
+
 console = Console()
-
-def get_subject_from_class_title(class_title):
-    title_array = class_title.split('-')
-    title_array.pop()
-    return '-'.join(title_array)[:-3]
-
-
-def get_class_number_from_class_title(class_title):
-    title_array = class_title.split('-')
-    title_array.pop()
-    return ' '.join(title_array).split(' ').pop()
-
-
-def get_subject_code_from_class_code(class_code):
-    return class_code[3:-2]
-
-
-def format_text(text):
-    if text == 'nan' or text == '0':
-        return '-'
-
-    text = text.replace('\r', ' ')
-
-    return text
-
 
 def print_ufabc_logo():
     print('''
@@ -50,18 +31,18 @@ def format_classes_dataframe(dataframe):
 
     dataframe = dataframe.astype({ 'Prática': str, 'Docente teoria': str, 'Docente prática': str, 'Teoria': str })
 
-    dataframe['Curso'] = dataframe['Curso'].apply(format_text)
-    dataframe['Docente teoria'] = dataframe['Docente teoria'].apply(format_text)
-    dataframe['Docente prática'] = dataframe['Docente prática'].apply(format_text)
-    dataframe['Turma'] = dataframe['Turma'].apply(format_text)
-    dataframe['Teoria'] = dataframe['Teoria'].apply(format_text)
+    dataframe['Curso'] = dataframe['Curso'].apply(text.format_text)
+    dataframe['Docente teoria'] = dataframe['Docente teoria'].apply(text.format_text)
+    dataframe['Docente prática'] = dataframe['Docente prática'].apply(text.format_text)
+    dataframe['Turma'] = dataframe['Turma'].apply(text.format_text)
+    dataframe['Teoria'] = dataframe['Teoria'].apply(text.format_text)
 
-    dataframe['Prática'] = dataframe['Prática'].apply(format_text);
+    dataframe['Prática'] = dataframe['Prática'].apply(text.format_text);
 
-    dataframe['Matéria'] = dataframe['Turma'].apply(get_subject_from_class_title)
-    dataframe['Turma'] = dataframe['Turma'].apply(get_class_number_from_class_title)
+    dataframe['Matéria'] = dataframe['Turma'].apply(text.get_subject_from_class_title)
+    dataframe['Turma'] = dataframe['Turma'].apply(text.get_class_number_from_class_title)
 
-    dataframe['Código da matéria'] = dataframe['Código de turma'].apply(get_subject_code_from_class_code)
+    dataframe['Código da matéria'] = dataframe['Código de turma'].apply(text.get_subject_code_from_class_code)
 
     dataframe = dataframe.drop('Código de turma', axis=1)
 
