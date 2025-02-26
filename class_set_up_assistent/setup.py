@@ -105,11 +105,48 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
             # Filter by class subject
             filtered_dataframe = cli.filter_classes_by_subject(filtered_dataframe)
 
-            console.clear()
-            print(tabulate(filtered_dataframe, headers='keys', tablefmt='mixed_grid', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
-            print('\n')
-
         if selected_filter_option == filter_options[1]:
-            print('[red]Em desenvolvimento, volte outro dia.[/red]\n')
+            print('[cyan]Selecione o dia da semana:[/cyan]')
+
+            days_of_week = [
+                'Segunda',
+                'Terça',
+                'Quarta',
+                'Quinta',
+                'Sexta',
+                'Sábado',
+                'Domingo',
+                '[yellow]Não filtrar[/yellow]'
+            ]
+            
+            day_of_week = select(days_of_week, cursor='🢧')
+
+            filtered_dataframe = filtered_dataframe[
+                filtered_dataframe['Teoria'].str.contains(day_of_week, case=False, regex=False)
+                | filtered_dataframe['Prática'].str.contains(day_of_week, case=False, regex=False)
+            ]
+
+            console.clear()
+
+            print('[cyan]Selecione o horário da aula:[/cyan]')
+
+            timetable = [
+                '8:00 às 10:00',
+                '10:00 às 12:00',
+                '19:00 às 21:00',
+                '21:00 às 23:00',
+                '[yellow]Não filtrar[/yellow]'
+            ]
+            
+            selected_timetable = select(timetable, cursor='🢧')
+
+            filtered_dataframe = filtered_dataframe[
+                filtered_dataframe['Teoria'].str.contains(selected_timetable, case=False, regex=False)
+                | filtered_dataframe['Prática'].str.contains(selected_timetable, case=False, regex=False)
+            ]
+
+        console.clear()
+        print(tabulate(filtered_dataframe, headers='keys', tablefmt='mixed_grid', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
+        print('\n')
 
         isRunning = confirm('[cyan]Deseja fazer uma nova busca?[/cyan]', default_is_yes=True)
