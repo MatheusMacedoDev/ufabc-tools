@@ -4,7 +4,7 @@ import pandas
 import tabula
 from tabulate import tabulate
 
-from beaupy import confirm
+from beaupy import confirm, select
 from beaupy.spinners import *
 
 from rich import print
@@ -78,21 +78,38 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
     while(isRunning):
         console.clear()
 
-        # Filter by class turn
-        filtered_dataframe = cli.filter_classes_by_turn(classes_dataframe)
+        print('[cyan]Selecione o tipo de filtragem que deseja aplicar:[/cyan]')
 
-        # Filter by class campus
-        filtered_dataframe = cli.filter_classes_by_campus(filtered_dataframe)
+        filter_options = [
+            'Filtrar por categorias',
+            'Filtrar por dia/horário'
+        ]
 
-        # Filter by class course
-        filtered_dataframe = cli.filter_classes_by_course(filtered_dataframe)
+        selected_filter_option = select(filter_options, cursor='🢧')
 
-        # Filter by class subject
-        filtered_dataframe = cli.filter_classes_by_subject(filtered_dataframe)
+        filtered_dataframe = classes_dataframe
 
         console.clear()
-        print(tabulate(filtered_dataframe, headers='keys', tablefmt='mixed_grid', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
 
-        print('\n')
+        if selected_filter_option == filter_options[0]:
+
+            # Filter by class turn
+            filtered_dataframe = cli.filter_classes_by_turn(filtered_dataframe)
+
+            # Filter by class campus
+            filtered_dataframe = cli.filter_classes_by_campus(filtered_dataframe)
+
+            # Filter by class course
+            filtered_dataframe = cli.filter_classes_by_course(filtered_dataframe)
+
+            # Filter by class subject
+            filtered_dataframe = cli.filter_classes_by_subject(filtered_dataframe)
+
+            console.clear()
+            print(tabulate(filtered_dataframe, headers='keys', tablefmt='mixed_grid', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
+            print('\n')
+
+        if selected_filter_option == filter_options[1]:
+            print('[red]Em desenvolvimento, volte outro dia.[/red]\n')
 
         isRunning = confirm('[cyan]Deseja fazer uma nova busca?[/cyan]', default_is_yes=True)
