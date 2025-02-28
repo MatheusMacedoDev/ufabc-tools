@@ -53,6 +53,31 @@ def get_classes_dataframe(pdf_uri):
     return classes_dataframe
 
 
+def filter_dataframe_by_timetable(dataframe, include_timetable, exclude_timetables, include_day_of_week, exclude_days_of_week):
+    include_mask = (
+        dataframe['Teoria'].str.contains(include_timetable, case=False, na=False) |
+        dataframe['Prática'].str.contains(include_timetable, case=False, na=False) &
+        dataframe['Teoria'].str.contains(include_day_of_week, case=False, na=False) |
+        dataframe['Prática'].str.contains(include_day_of_week, case=False, na=False)
+    )
+
+    exclude_mask = pandas.Series(False, index=dataframe.index)
+
+    for exclude_timetable in exclude_timetables:
+        exclude_mask |= (
+            dataframe['Teoria'].str.contains(exclude_timetable, case=False, na=False) |
+            dataframe['Prática'].str.contains(exclude_timetable, case=False, na=False)
+        )
+
+    for exclude_day_of_week in exclude_days_of_week:
+        exclude_mask |= (
+            dataframe['Teoria'].str.contains(exclude_day_of_week, case=False, na=False) |
+            dataframe['Prática'].str.contains(exclude_day_of_week, case=False, na=False)
+        )
+
+    return dataframe[include_mask & ~exclude_mask]
+
+
 console = Console()
 
 spinner = Spinner(ARC, 'Carregando...')
@@ -119,18 +144,16 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
                 '[yellow]Não filtrar[/yellow]'
             ]
             
-            day_of_week = select(days_of_week, cursor='🢧')
+            selected_day_of_week = select(days_of_week, cursor='🢧')
 
-            filtered_dataframe = filtered_dataframe[
-                filtered_dataframe['Teoria'].str.contains(day_of_week, case=False, regex=False)
-                | filtered_dataframe['Prática'].str.contains(day_of_week, case=False, regex=False)
-            ]
+            days_of_week.pop()
+            days_of_week.remove(selected_day_of_week)
 
             console.clear()
 
             print('[cyan]Selecione o horário da aula:[/cyan]')
 
-            timetable = [
+            timetables = [
                 '8:00 às 10:00',
                 '10:00 às 12:00',
                 '19:00 às 21:00',
@@ -138,12 +161,24 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
                 '[yellow]Não filtrar[/yellow]'
             ]
             
-            selected_timetable = select(timetable, cursor='🢧')
+            selected_timetable = select(timetables, cursor='🢧')
 
-            filtered_dataframe = filtered_dataframe[
-                filtered_dataframe['Teoria'].str.contains(selected_timetable, case=False, regex=False)
-                | filtered_dataframe['Prática'].str.contains(selected_timetable, case=False, regex=False)
-            ]
+            console.clear()
+
+            should_filter_exclusively = confirm('[cyan]Mostrar exclusivamente aqueles que seguem o filtro?[/cyan]', default_is_yes=True)
+
+            timetables.pop()
+            timetables.remove(selected_timetable)
+
+            if should_filter_exclusively:
+                filtered_dataframe = filter_dataframe_by_timetable(filtered_dataframe, selected_timetable, timetables, selected_day_of_week, days_of_week)
+            else:
+                filtered_dataframe = filtered_dataframe[
+                    filtered_dataframe['Teoria'].str.contains(selected_day_of_week, case=False, regex=False) |
+                    filtered_dataframe['Prática'].str.contains(selected_day_of_week, case=False, regex=False) &
+                    filtered_dataframe['Teoria'].str.contains(selected_timetable, case=False, regex=False) |
+                    filtered_dataframe['Prática'].str.contains(selected_timetable, case=False, regex=False)
+                ]
 
         console.clear()
         print(tabulate(filtered_dataframe, headers='keys', tablefmt='mixed_grid', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
