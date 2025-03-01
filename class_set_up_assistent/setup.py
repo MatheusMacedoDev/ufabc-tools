@@ -4,7 +4,7 @@ import pandas
 import tabula
 from tabulate import tabulate
 
-from beaupy import confirm, select
+from beaupy import confirm, select, select_multiple
 from beaupy.spinners import *
 
 from rich import print
@@ -53,27 +53,40 @@ def get_classes_dataframe(pdf_uri):
     return classes_dataframe
 
 
-def filter_dataframe_by_day_and_timetable(dataframe, include_timetable, exclude_timetables, include_day_of_week, exclude_days_of_week):
-    include_mask = (
-        dataframe['Teoria'].str.contains(include_timetable, case=False, na=False) |
-        dataframe['Prática'].str.contains(include_timetable, case=False, na=False) &
-        dataframe['Teoria'].str.contains(include_day_of_week, case=False, na=False) |
-        dataframe['Prática'].str.contains(include_day_of_week, case=False, na=False)
-    )
+def filter_dataframe_by_day_and_timetable(dataframe, include_timetables, exclude_timetables, include_days_of_week, exclude_days_of_week):
+    if (len(include_timetables) == 0 and len(include_days_of_week) == 0):
+        return dataframe
 
+    include_mask = pandas.Series(False, index=dataframe.index)
     exclude_mask = pandas.Series(False, index=dataframe.index)
 
-    for exclude_timetable in exclude_timetables:
-        exclude_mask |= (
-            dataframe['Teoria'].str.contains(exclude_timetable, case=False, na=False) |
-            dataframe['Prática'].str.contains(exclude_timetable, case=False, na=False)
-        )
+    if (len(include_timetables) > 0):
 
-    for exclude_day_of_week in exclude_days_of_week:
-        exclude_mask |= (
-            dataframe['Teoria'].str.contains(exclude_day_of_week, case=False, na=False) |
-            dataframe['Prática'].str.contains(exclude_day_of_week, case=False, na=False)
-        )
+        for include_timetable in include_timetables:
+            include_mask |= (
+                dataframe['Teoria'].str.contains(include_timetable, case=False, na=False) |
+                dataframe['Prática'].str.contains(include_timetable, case=False, na=False)
+            )
+
+        for exclude_timetable in exclude_timetables:
+            exclude_mask |= (
+                dataframe['Teoria'].str.contains(exclude_timetable, case=False, na=False) |
+                dataframe['Prática'].str.contains(exclude_timetable, case=False, na=False)
+            )
+
+    if (len(include_days_of_week) > 0):
+
+        for include_day_of_week in include_days_of_week:
+            include_mask |= (
+                dataframe['Teoria'].str.contains(include_day_of_week, case=False, na=False) |
+                dataframe['Prática'].str.contains(include_day_of_week, case=False, na=False)
+            )
+
+        for exclude_day_of_week in exclude_days_of_week:
+            exclude_mask |= (
+                dataframe['Teoria'].str.contains(exclude_day_of_week, case=False, na=False) |
+                dataframe['Prática'].str.contains(exclude_day_of_week, case=False, na=False)
+            )
 
     return dataframe[include_mask & ~exclude_mask]
 
@@ -140,14 +153,13 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
                 'Quinta',
                 'Sexta',
                 'Sábado',
-                'Domingo',
-                '[yellow]Não filtrar[/yellow]'
+                'Domingo'
             ]
             
-            selected_day_of_week = select(days_of_week, cursor='🢧')
+            selected_days_of_week = select_multiple(days_of_week, tick_character='✓')
 
-            days_of_week.pop()
-            days_of_week.remove(selected_day_of_week)
+            for selected_day_of_week in selected_days_of_week:
+                days_of_week.remove(selected_day_of_week)
 
             console.clear()
 
@@ -157,23 +169,22 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
                 '8:00 às 10:00',
                 '10:00 às 12:00',
                 '19:00 às 21:00',
-                '21:00 às 23:00',
-                '[yellow]Não filtrar[/yellow]'
+                '21:00 às 23:00'
             ]
             
-            selected_timetable = select(timetables, cursor='🢧')
+            selected_timetables = select_multiple(timetables, tick_character='✓')
+
+            for selected_timetable in selected_timetables:
+                timetables.remove(selected_timetable)
 
             console.clear()
 
             should_filter_exclusively = confirm('[cyan]Mostrar exclusivamente aqueles que seguem o filtro?[/cyan]', default_is_yes=True)
 
-            timetables.pop()
-            timetables.remove(selected_timetable)
-
             if should_filter_exclusively:
-                filtered_dataframe = filter_dataframe_by_day_and_timetable(filtered_dataframe, selected_timetable, timetables, selected_day_of_week, days_of_week)
+                filtered_dataframe = filter_dataframe_by_day_and_timetable(filtered_dataframe, selected_timetables, timetables, selected_days_of_week, days_of_week)
             else:
-                filtered_dataframe = filter_dataframe_by_day_and_timetable(filtered_dataframe, selected_timetable, [], selected_day_of_week, [])
+                filtered_dataframe = filter_dataframe_by_day_and_timetable(filtered_dataframe, selected_timetables, [], selected_days_of_week, [])
 
         console.clear()
         print(tabulate(filtered_dataframe, headers='keys', tablefmt='mixed_grid', maxcolwidths=12, maxheadercolwidths=8, numalign='center', stralign='center', showindex=False))
