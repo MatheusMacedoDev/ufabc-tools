@@ -53,6 +53,14 @@ def get_classes_dataframe(pdf_uri):
     return classes_dataframe
 
 
+def add_filtered_by_substrings_elements_to_mask(mask, dataframe, substrings):
+    for substring in substrings:
+        mask |= (
+            dataframe['Teoria'].str.contains(substring, case=False, na=False) |
+            dataframe['Prática'].str.contains(substring, case=False, na=False)
+        )
+
+
 def filter_dataframe_by_day_and_timetable(dataframe, include_timetables, exclude_timetables, include_days_of_week, exclude_days_of_week):
     if (len(include_timetables) == 0 and len(include_days_of_week) == 0):
         return dataframe
@@ -61,32 +69,12 @@ def filter_dataframe_by_day_and_timetable(dataframe, include_timetables, exclude
     exclude_mask = pandas.Series(False, index=dataframe.index)
 
     if (len(include_timetables) > 0):
-
-        for include_timetable in include_timetables:
-            include_mask |= (
-                dataframe['Teoria'].str.contains(include_timetable, case=False, na=False) |
-                dataframe['Prática'].str.contains(include_timetable, case=False, na=False)
-            )
-
-        for exclude_timetable in exclude_timetables:
-            exclude_mask |= (
-                dataframe['Teoria'].str.contains(exclude_timetable, case=False, na=False) |
-                dataframe['Prática'].str.contains(exclude_timetable, case=False, na=False)
-            )
+        add_filtered_by_substrings_elements_to_mask(include_mask, dataframe, include_timetables)
+        add_filtered_by_substrings_elements_to_mask(exclude_mask, dataframe, exclude_timetables)
 
     if (len(include_days_of_week) > 0):
-
-        for include_day_of_week in include_days_of_week:
-            include_mask |= (
-                dataframe['Teoria'].str.contains(include_day_of_week, case=False, na=False) |
-                dataframe['Prática'].str.contains(include_day_of_week, case=False, na=False)
-            )
-
-        for exclude_day_of_week in exclude_days_of_week:
-            exclude_mask |= (
-                dataframe['Teoria'].str.contains(exclude_day_of_week, case=False, na=False) |
-                dataframe['Prática'].str.contains(exclude_day_of_week, case=False, na=False)
-            )
+        add_filtered_by_substrings_elements_to_mask(include_mask, dataframe, include_days_of_week)
+        add_filtered_by_substrings_elements_to_mask(exclude_mask, dataframe, exclude_days_of_week)
 
     return dataframe[include_mask & ~exclude_mask]
 
