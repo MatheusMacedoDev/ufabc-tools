@@ -3,7 +3,6 @@
 from tabulate import tabulate
 
 from beaupy import confirm, select, select_multiple
-from beaupy.spinners import *
 
 from rich import print
 from rich.console import Console
@@ -17,8 +16,6 @@ import config
 
 console = Console()
 
-spinner = Spinner(ARC, 'Carregando...')
-
 console.clear()
 
 cli.print_start_decoration()
@@ -28,11 +25,9 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
     console.clear()
     cli.print_ufabc_logo()
 
-    spinner.start()
-
-    classes_dataframe = table.get_classes_dataframe(config.classes_pdf_uri)
-
-    spinner.stop()
+    classes_dataframe = cli.spinner_loading(
+        lambda: table.get_classes_dataframe(config.classes_pdf_uri)
+    )
 
     isRunning = True;
 

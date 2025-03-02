@@ -1,6 +1,7 @@
 # External imports
 
 from beaupy import select
+from beaupy.spinners import *
 from rich.console import Console
 from rich import print
 
@@ -34,6 +35,16 @@ def print_start_decoration():
 
 (Por: Matheus Macedo)
     ''')
+
+spinner = Spinner(ARC, 'Carregando...')
+
+def spinner_loading(callback_fn):
+    spinner.start()
+    return_of_callback = callback_fn()
+    spinner.stop()
+
+    return return_of_callback
+
 
 
 def select_input(options_list, description):
