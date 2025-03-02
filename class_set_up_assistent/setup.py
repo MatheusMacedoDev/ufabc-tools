@@ -14,10 +14,11 @@ from rich.console import Console
 
 import text
 import cli
+import config
 
 
 def format_classes_dataframe(dataframe):
-    dataframe.columns = ['Curso', 'Código de turma', 'Turma', 'Teoria', 'Prática', 'Campus', 'Turno', 'T-P-I', 'Vagas totais', 'Vagas veteranos', 'Docente teoria', 'Docente teoria 2', 'Docente prática', 'Docente prática 2']
+    dataframe.columns = config.starter_classes_table_columns
 
     dataframe = dataframe.drop('Docente teoria 2', axis=1)
     dataframe = dataframe.drop('Docente prática 2', axis=1)
@@ -94,8 +95,7 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
 
     spinner.start()
 
-    classes_pdf_uri = 'turmas_ofertadas.pdf'
-    classes_dataframe = get_classes_dataframe(classes_pdf_uri)
+    classes_dataframe = get_classes_dataframe(config.classes_pdf_uri)
 
     spinner.stop()
 
@@ -134,43 +134,28 @@ if confirm('[cyan]Esse script promete te ajudar a montar sua grade na UFABC. Des
         if selected_filter_option == filter_options[1]:
             print('[cyan]Selecione o dia da semana:[/cyan]')
 
-            days_of_week = [
-                'Segunda',
-                'Terça',
-                'Quarta',
-                'Quinta',
-                'Sexta',
-                'Sábado',
-                'Domingo'
-            ]
-            
-            selected_days_of_week = select_multiple(days_of_week, tick_character='✓')
+            selected_days_of_week = select_multiple(config.days_of_week, tick_character='✓')
 
+            unselected_days_of_week = config.days_of_week
             for selected_day_of_week in selected_days_of_week:
-                days_of_week.remove(selected_day_of_week)
+                unselected_days_of_week.remove(selected_day_of_week)
 
             console.clear()
 
             print('[cyan]Selecione o horário da aula:[/cyan]')
 
-            timetables = [
-                '8:00 às 10:00',
-                '10:00 às 12:00',
-                '19:00 às 21:00',
-                '21:00 às 23:00'
-            ]
-            
-            selected_timetables = select_multiple(timetables, tick_character='✓')
+            selected_timetables = select_multiple(config.timetables, tick_character='✓')
 
+            unselected_timetables = config.timetables
             for selected_timetable in selected_timetables:
-                timetables.remove(selected_timetable)
+                unselected_timetables.remove(selected_timetable)
 
             console.clear()
 
             should_filter_exclusively = confirm('[cyan]Mostrar exclusivamente aqueles que seguem o filtro?[/cyan]', default_is_yes=True)
 
             if should_filter_exclusively:
-                filtered_dataframe = filter_dataframe_by_day_and_timetable(filtered_dataframe, selected_timetables, timetables, selected_days_of_week, days_of_week)
+                filtered_dataframe = filter_dataframe_by_day_and_timetable(filtered_dataframe, selected_timetables, unselected_timetables, selected_days_of_week, unselected_days_of_week)
             else:
                 filtered_dataframe = filter_dataframe_by_day_and_timetable(filtered_dataframe, selected_timetables, [], selected_days_of_week, [])
 

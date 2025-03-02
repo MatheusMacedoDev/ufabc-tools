@@ -4,6 +4,10 @@ from beaupy import select
 from rich.console import Console
 from rich import print
 
+# Internal imports
+
+import config
+
 
 console = Console()
 
@@ -49,12 +53,7 @@ def select_input(options_list, description):
 
 
 def filter_classes_by_turn(dataframe):
-    turns = [
-        'Matutino',
-        'Noturno',
-    ]
-
-    [selected_turn, is_filter_empty] = select_input(turns, 'Selecione o turno:')
+    [selected_turn, is_filter_empty] = select_input(config.turns, 'Selecione o turno:')
 
     if is_filter_empty:
         return dataframe
@@ -66,12 +65,7 @@ def filter_classes_by_turn(dataframe):
 
 
 def filter_classes_by_campus(dataframe):
-    campus = [
-        'SA',
-        'SB',
-    ]
-
-    [selected_campus, is_filter_empty] = select_input(campus, 'Selecione o campus:')
+    [selected_campus, is_filter_empty] = select_input(config.campus, 'Selecione o campus:')
 
     if is_filter_empty:
         return dataframe
