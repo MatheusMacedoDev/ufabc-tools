@@ -13,6 +13,8 @@ def format_classes_dataframe(dataframe):
 
     dataframe = dataframe.drop('Docente teoria 2', axis=1)
     dataframe = dataframe.drop('Docente prática 2', axis=1)
+    dataframe = dataframe.drop('Docente teoria 3', axis=1)
+    dataframe = dataframe.drop('Docente prática 3', axis=1)
 
     dataframe = dataframe.astype({ 'Prática': str, 'Docente teoria': str, 'Docente prática': str, 'Teoria': str })
 
@@ -31,9 +33,9 @@ def format_classes_dataframe(dataframe):
 
     dataframe = dataframe.drop('Código de turma', axis=1)
 
-    dataframe = dataframe.iloc[:, [0, 11, 1, 9, 10, 2, 3, 4, 5, 6, 7, 8, 12]]
+    final_dataframe = dataframe.iloc[:, [0, 12, 1, 2, 3, 10, 11, 4, 5, 6, 7, 8, 9, 13]]
 
-    return dataframe
+    return final_dataframe
 
 
 def get_classes_dataframe(pdf_uri):

@@ -1,6 +1,7 @@
 classes_pdf_uri = 'turmas_ofertadas.pdf'
 
-starter_classes_table_columns = ['Curso', 'Código de turma', 'Turma', 'Teoria', 'Prática', 'Campus', 'Turno', 'T-P-I', 'Vagas totais', 'Vagas veteranos', 'Docente teoria', 'Docente teoria 2', 'Docente prática', 'Docente prática 2']
+starter_classes_table_columns = ['Curso', 'Código de turma', 'Turma', 'Teoria', 'Prática', 'Campus', 'Turno', 'T-P-E-I', 'Vagas totais', 
+    'Vagas ingressantes', 'Vagas veteranos', 'Docente teoria', 'Docente teoria 2','Docente teoria 3', 'Docente prática', 'Docente prática 2', 'Docente prática 3']
 
 turns = [
     'Matutino',
